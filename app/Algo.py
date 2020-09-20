@@ -83,7 +83,6 @@ def apply(input):
                 scoring_list[sublease["address"]] = score
 
     sorted_list = sorted(scoring_list.items(), key=lambda x: x[1], reverse=True)
-    sorted_list = map(lambda dict(x):x, sorted_list)
     return sorted_list
 
 
@@ -145,7 +144,7 @@ def scoring_function(weights, sublet, sublease):
             score -= 5
         if sublet["range"]  == 0:
             score += 5
-        #score -= distance * weights["coordinates"]
+        score -= distance * weights["coordinates"]
 
         # res = api_additions(weights, sublet, sublease, score)
         #
