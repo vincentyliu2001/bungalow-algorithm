@@ -83,7 +83,7 @@ def apply(input):
                 scoring_list[sublease["address"]] = score
 
     sorted_list = sorted(scoring_list.items(), key=lambda x: x[1], reverse=True)
-
+    sorted_list = map(lambda dict(x):x, sorted_list)
     return sorted_list
 
 

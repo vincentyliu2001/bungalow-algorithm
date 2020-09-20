@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from .Algo import apply
 app = Flask(__name__)
 
@@ -10,4 +10,4 @@ def query_example():
     if not request.json :
         return 'Please Pass a Valid JSON Object'
     else:
-        return apply(request.json)
+        return jsonify(apply(request.json))
