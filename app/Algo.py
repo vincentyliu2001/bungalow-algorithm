@@ -1,6 +1,7 @@
 import copy
 import random, string, math
-
+import requests
+import json
 example_input = {
     "sublet": {
     "name": 'joe',
@@ -19,8 +20,8 @@ example_input = {
             "price": 900,
             "bedroom": 3.0,
             "address": '2918 Ravensport Dr',
-            "lat": 75,
-            "lon": 30,
+            "lat": 38.573938,
+            "lon": -121.465378,
 
         },
         {
@@ -51,6 +52,8 @@ example_input = {
         "hospital": 1,
     }
 }
+
+
 
 class AlgorithmError(Exception):
      def __init__(self, value):
@@ -84,7 +87,6 @@ def apply(input):
 
     sorted_list = sorted(scoring_list.items(), key=lambda x: x[1], reverse=True)
     print(sorted_list)
-
 
 
 def overwriteWeights(default, new):
@@ -146,35 +148,54 @@ def scoring_function(weights, sublet, sublease):
             score += 5
         #score -= distance * weights["coordinates"]
 
-        # res = api_additions(weights, sublet, sublease, score)
+        res = api_additions(weights, sublet, sublease, score)
         #
-        # return res
-    return score
+    return res
 
-# TODO
+
+# thank you https://python.gotrained.com/google-places-api-extracting-location-data-reviews/ for this function
+
+
+def search_places_by_coordinate(lat, lon, types):
+    endpoint_url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
+    places = []
+    params = {
+        'location': str(lat) + ',' + str(lon),
+        'radius': 2000,
+        'types': types,
+        'key': 'AIzaSyBJsPR0hLvmnSgGu4u9KThHP0M7acYkFM0'
+    }
+    res = requests.get(endpoint_url, params=params)
+    results = json.loads(res.content)
+    places.extend(results['results'])
+    return places
+
+
 def api_additions(weights, sublet, sublease, score):
+    lat = sublease["lat"]
+    lon = sublease["lon"]
+    restaurants = search_places_by_coordinate(lat, lon, "restaurant")
+    count = len(restaurants)
+    if count == 0:
+        score = score - 3
+    else:
+        score = score - 2 * weights["amenities"] / count ** 1.5
 
-        lat = sublet["lat"]
-        lon = sublease["lon"]
-        restaurants = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location={0},{1}&radius=2000&type=restaurant&keyword=chinese&key=AIzaSyBJsPR0hLvmnSgGu4u9KThHP0M7acYkFM0'.format(lat, lon)
+    hos = max(weights["hospital"], 0.25)
 
-        count = len[restaurants]
-        score = score - 2 * weights["amenities"] / count^1.5
+    hospitals = search_places_by_coordinate(lat, lon, "hospital")
+    if len(hospitals) == 0:
+        score -= 1.2 * weights["hospital"]
 
-        hos = max(weight["hospital"], 0.25)
+    # address = sublease["address"]
+    # loc = 'https://maps.googleapis.com/maps/api/geocode/json?address={0}&key=IzaSyBJsPR0hLvmnSgGu4u9KThHP0M7acYkFM0'.format(address)
+    # print(loc)
+    # ID = loc["place_id"]
+    # result = 'https://maps.googleapis.com/maps/api/place/details/json?placeid={0}&key=AIzaSyBJsPR0hLvmnSgGu4u9KThHP0M7acYkFM0'.format(ID)
+    # print(result)
+    # if result["rating"] != 'ZERO_RESULTS':
+    #     score = score * result["rating"] / 5
 
-        hospitals = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location={0},{1}&radius=(12000/hos)&type=restaurant&keyword=chinese&key=AIzaSyBJsPR0hLvmnSgGu4u9KThHP0M7acYkFM0'.format(lat, lon)
-        if len[hospitals] == 0:
-            score -= 1.2 * weight["hospital"]
-
-        address = sublease["address"]
-        loc = 'https://maps.googleapis.com/maps/api/geocode/json?address={0}&key=IzaSyBJsPR0hLvmnSgGu4u9KThHP0M7acYkFM0'.format(address)
-        ID = loc["place_id"]
-        result = 'https://maps.googleapis.com/maps/api/place/details/json?placeid={0}&key=AIzaSyBJsPR0hLvmnSgGu4u9KThHP0M7acYkFM0'.format(ID)
-
-        if result["rating"] != 'ZERO_RESULTS':
-            score = score * result["rating"] / 5
-
-        return score
+    return score
 
 apply(example_input)
