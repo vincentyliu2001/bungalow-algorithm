@@ -1,4 +1,5 @@
 import copy
+from flask import Flask, request, jsonify
 import random, string, math
 import requests
 import json
@@ -86,7 +87,8 @@ def apply(input):
                 scoring_list[sublease["address"]] = score
 
     sorted_list = sorted(scoring_list.items(), key=lambda x: x[1], reverse=True)
-    return sorted_list
+    print(jsonify(sorted_list))
+    return jsonify(sorted_list)
 
 
 def overwriteWeights(default, new):
