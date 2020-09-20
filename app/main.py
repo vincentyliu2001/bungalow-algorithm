@@ -1,5 +1,5 @@
 from flask import Flask, request
-
+from .Algo import apply
 app = Flask(__name__)
 
 @app.route("/")
@@ -10,4 +10,4 @@ def query_example():
     if not request.json :
         return 'Please Pass a Valid JSON Object'
     else:
-        return 'apply(request.json)'
+        return apply(request.json)
