@@ -2,56 +2,56 @@ import copy
 import random, string, math
 import requests
 import json
-example_input = {
-    "sublet": {
-    "name": 'joe',
-    "sqft": 1000,
-    "lowPrice": 600,
-    "highPrice": 1000,
-    "bedroom": 3.0,
-    "lat": 75,
-    "lon": 30,
-    "range": 20
-    },
-    "subleasers": [
-        {
-            "name": 'jim',
-            "sqft": 1000,
-            "price": 900,
-            "bedroom": 3.0,
-            "address": '2918 Ravensport Dr',
-            "lat": 38.573938,
-            "lon": -121.465378,
-
-        },
-        {
-            "name": 'karen',
-            "sqft": 975,
-            "price": 1100,
-            "bedroom": 4.0,
-            "address": '2626 Salado Dr',
-            "lat": 75,
-            "lon": 30,
-        },
-        {
-        "name": 'pam',
-        "sqft" : 650,
-        "price" : 625,
-        "bedroom" : 2.0,
-        "address": '4734 Burclare Ct',
-        "lat": 75,
-        "lon": 30,
-        }
-    ],
-    "scoring_weights": {
-        "sqft": 1.0,
-        "price range": 1.0,
-        "bedroom": 1.0,
-        "coordinates": 1.0,
-        "amenities": 0.3,
-        "hospital": 1,
-    }
-}
+# example_input = {
+#     "sublet": {
+#     "name": 'joe',
+#     "sqft": 1000,
+#     "lowPrice": 600,
+#     "highPrice": 1000,
+#     "bedroom": 3.0,
+#     "lat": 75,
+#     "lon": 30,
+#     "range": 20
+#     },
+#     "subleasers": [
+#         {
+#             "name": 'jim',
+#             "sqft": 1000,
+#             "price": 900,
+#             "bedroom": 3.0,
+#             "address": '2918 Ravensport Dr',
+#             "lat": 75,
+#             "lon": 30,
+#
+#         },
+#         {
+#             "name": 'karen',
+#             "sqft": 975,
+#             "price": 1100,
+#             "bedroom": 4.0,
+#             "address": '2626 Salado Dr',
+#             "lat": 75,
+#             "lon": 30,
+#         },
+#         {
+#         "name": 'pam',
+#         "sqft" : 650,
+#         "price" : 625,
+#         "bedroom" : 2.0,
+#         "address": '4734 Burclare Ct',
+#         "lat": 75,
+#         "lon": 30,
+#         }
+#     ],
+#     "scoring_weights": {
+#         "sqft": 1.0,
+#         "price range": 1.0,
+#         "bedroom": 1.0,
+#         "coordinates": 1.0,
+#         "amenities": 0.3,
+#         "hospital": 1,
+#     }
+# }
 
 
 
@@ -86,7 +86,7 @@ def apply(input):
                 scoring_list[sublease["address"]] = score
 
     sorted_list = sorted(scoring_list.items(), key=lambda x: x[1], reverse=True)
-    print(sorted_list)
+    return sorted_list
 
 
 def overwriteWeights(default, new):
@@ -146,7 +146,7 @@ def scoring_function(weights, sublet, sublease):
             score -= 5
         if sublet["range"]  == 0:
             score += 5
-        #score -= distance * weights["coordinates"]
+        score -= distance * weights["coordinates"]
 
         res = api_additions(weights, sublet, sublease, score)
         #
@@ -198,4 +198,4 @@ def api_additions(weights, sublet, sublease, score):
 
     return score
 
-apply(example_input)
+# apply(example_input)
